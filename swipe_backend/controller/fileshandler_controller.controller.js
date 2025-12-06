@@ -12,7 +12,7 @@ export const fileshandler_controller = async (req, res) => {
     }
     const fileParts = [];
 
-    // ⭐ Process Each File
+    // converting xlxs to csv and all files to base64
     for (const file of files) {
       // 🔵 If Excel: Convert to CSV
       if (
@@ -43,7 +43,7 @@ export const fileshandler_controller = async (req, res) => {
       });
     }
 
-    // ⭐ Prompt for extraction
+    // Prompt for extraction
     const prompt = {
       text: `
 You are an advanced invoice, product, and customer data extraction engine.
@@ -125,7 +125,7 @@ Now extract the data.
 
     const contents = [prompt, ...fileParts];
 
-    // ⭐ Call Gemini
+    // ai integration 
     console.log("loading.......");
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash",
