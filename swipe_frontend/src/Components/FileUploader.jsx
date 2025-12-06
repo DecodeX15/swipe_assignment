@@ -10,7 +10,7 @@ const UploadBox = () => {
 
   return (
     <div className="w-full mb-6">
-      <label className="block text-lg font-semibold text-black dark:text-white mb-2">
+      <label className="block text-lg font-semibold text-white dark:text-white mb-2">
         Upload Files
       </label>
 
@@ -27,10 +27,10 @@ const UploadBox = () => {
       {/* Show Selected File Names */}
       {selectedFiles.length > 0 && (
         <div className="mt-3">
-          <p className="text-black dark:text-white font-medium mb-1">
+          <p className="text-white dark:text-white font-medium mb-1">
             Selected Files:
           </p>
-          <ul className="list-disc ml-6 text-black dark:text-gray-300 text-sm">
+          <ul className="list-disc ml-6 text-white dark:text-gray-300 text-sm">
             {selectedFiles.map((file, index) => (
               <li key={index}>{file.name}</li>
             ))}

@@ -17,7 +17,7 @@ const Analyse = () => {
               className={`px-4 py-2 rounded-lg border cursor-pointer ${
                 activeTab === "invoices"
                   ? "bg-blue-600 text-white"
-                  : "bg-transparent text-black dark:text-white"
+                  : "bg-transparent text-white dark:text-white"
               }`}
         >
           Invoices
@@ -28,7 +28,7 @@ const Analyse = () => {
               className={`px-4 py-2 rounded-lg border cursor-pointer ${
                 activeTab === "products"
                   ? "bg-blue-600 text-white"
-                  : "bg-transparent text-black dark:text-white"
+                  : "bg-transparent text-white dark:text-white"
               }`}
         >
           Products
@@ -39,7 +39,7 @@ const Analyse = () => {
               className={`px-4 py-2 rounded-lg border cursor-pointer ${
                 activeTab === "customers"
                   ? "bg-blue-600 text-white"
-                  : "bg-transparent text-black dark:text-white"
+                  : "bg-transparent text-white dark:text-white"
               }`}
         >
           Customers

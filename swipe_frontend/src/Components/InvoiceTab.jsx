@@ -1,7 +1,7 @@
 const InvoiceTab = () => {
   return (
     <div className="p-4">
-      <h2 className="text-xl font-semibold mb-4 text-black dark:text-white">
+      <h2 className="text-xl font-semibold mb-4 text-white dark:text-white">
         Invoices
       </h2>
 
@@ -9,7 +9,7 @@ const InvoiceTab = () => {
       <div className="overflow-x-auto">
         <table className="w-full border-collapse">
           <thead>
-            <tr className="text-left border-b border-gray-500">
+            <tr className="text-left border-b border-gray-500 text-white">
               <th className="p-2">Serial No</th>
               <th className="p-2">Customer</th>
               <th className="p-2">Product</th>
@@ -20,7 +20,7 @@ const InvoiceTab = () => {
             </tr>
           </thead>
 
-          <tbody>
+          <tbody className="text-white">
             {/* Dynamic data will come from Redux */}
             <tr>
               <td className="p-2">—</td>
