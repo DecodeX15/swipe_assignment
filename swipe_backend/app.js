@@ -4,7 +4,7 @@ import express from "express";
 import cors from "cors";
 const app = express();
 import cookieParser from "cookie-parser";
-import { fileshandler_router } from "./Routes/files_handler_router.router.js";
+import { fileshandler_router } from "./routes/files_handler_router.router.js";
 app.use(cors({ origin: "*" }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
