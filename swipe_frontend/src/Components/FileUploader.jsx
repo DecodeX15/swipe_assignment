@@ -2,31 +2,43 @@ import { useState } from "react";
 import axios from "axios";
 import { useDispatch } from "react-redux";
 import { setInvoices } from "../features/invoicesSlice";
-import { motion } from "framer-motion"; // Import framer-motion
-
+import { motion } from "framer-motion"; // Import framer-motio
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer, toast } from "react-toastify";
 const UploadBox = () => {
   const [selectedFiles, setSelectedFiles] = useState([]);
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
-
+  const allowedTypes = [
+    "application/pdf",
+    "image/jpeg",
+    "image/png",
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // .xlsx
+    "application/vnd.ms-excel", // .xls
+    "text/csv", // .csv
+  ];
   const handleFileChange = async (e) => {
     const files = Array.from(e.target.files);
-
     if (!files || files.length === 0) {
       alert("No files selected");
       return;
     }
-
     setLoading(true);
-
+    const invalidFiles = files.filter(
+      (file) => !allowedTypes.includes(file.type)
+    );
+    if (invalidFiles.length > 0) {
+      setLoading(false);
+      toast.error(
+        "Invalid file selected! Allowed: PDF, JPG, PNG, XLS, XLSX, CSV"
+      );
+      return;
+    }
     try {
       const formData = new FormData();
       files.forEach((file) => {
         formData.append("files", file);
       });
-      
-      console.log("Uploading and analyzing files...");
-
       const res = await axios.post(
         "http://localhost:5000/api/files_analysis",
         formData,
@@ -38,15 +50,18 @@ const UploadBox = () => {
       );
 
       console.log("Response:", res.data);
-      alert(res.data.message || "Files uploaded successfully");
+      toast.success(
+        res?.message || "Files uploaded and analyzed successfully!"
+      );
       dispatch(setInvoices(res?.data?.data?.invoices || []));
       setSelectedFiles(files);
-
     } catch (error) {
       console.error("Upload error:", error);
-      alert(error.response?.data?.message || "An error occurred during upload.");
+      toast.error(
+        "Server issue : " + error.response?.data?.error || "An error occurred during upload."
+      );
+      console.log(error.response?.data?.error);
       setSelectedFiles([]);
-
     } finally {
       setLoading(false);
     }
@@ -106,11 +121,25 @@ const UploadBox = () => {
           onChange={handleFileChange}
           className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
         />
-        
+
         <div className="flex flex-col items-center justify-center text-center">
-          <svg className="w-8 h-8 text-blue-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.884 1.391C5.908 17.6 5 18 5 18H4c-1.1 0-2-.9-2-2V7c0-1.1.9-2 2-2h16c1.1 0 2 .9 2 2v10c0 .35-.08.68-.23.97l-2.4-2.4a.8.8 0 00-1.13 0l-2.67 2.67a.8.8 0 000 1.13l-1.9 1.9a.8.8 0 00-1.13 0l-3.37-3.37a.8.8 0 00-1.13 0zM12 13a2 2 0 100-4 2 2 0 000 4z"></path></svg>
+          <svg
+            className="w-8 h-8 text-blue-400 mb-2"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M7 16a4 4 0 01-.884 1.391C5.908 17.6 5 18 5 18H4c-1.1 0-2-.9-2-2V7c0-1.1.9-2 2-2h16c1.1 0 2 .9 2 2v10c0 .35-.08.68-.23.97l-2.4-2.4a.8.8 0 00-1.13 0l-2.67 2.67a.8.8 0 000 1.13l-1.9 1.9a.8.8 0 00-1.13 0l-3.37-3.37a.8.8 0 00-1.13 0zM12 13a2 2 0 100-4 2 2 0 000 4z"
+            ></path>
+          </svg>
           <p className="text-white font-semibold">
-            Drag & Drop or <span className="text-blue-400 underline">Browse Files</span>
+            Drag & Drop or{" "}
+            <span className="text-blue-400 underline">Browse Files</span>
           </p>
           <p className="text-xs text-gray-400 mt-1">
             (PDF, Image, Excel - Max 5MB per file)
@@ -136,9 +165,7 @@ const UploadBox = () => {
                 className="flex justify-between items-center text-gray-300 text-sm"
                 variants={fileItemVariants}
               >
-                <span className="truncate flex-1">
-                  📄 {file.name}
-                </span>
+                <span className="truncate flex-1">📄 {file.name}</span>
                 <span className="ml-4 text-xs text-gray-500">
                   ({(file.size / 1024 / 1024).toFixed(2)} MB)
                 </span>
@@ -147,6 +174,7 @@ const UploadBox = () => {
           </ul>
         </motion.div>
       )}
+      <ToastContainer />
     </motion.div>
   );
 };

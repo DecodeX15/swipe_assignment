@@ -6,6 +6,7 @@ const ProductsTab = () => {
   const dispatch = useDispatch();
   const invoices = useSelector((state) => state.invoices.invoices || []);
   const [tableData, setTableData] = useState([]);
+  const [check, setCheck] = useState(false);
 
   useEffect(() => {
     setTableData(invoices);
@@ -33,7 +34,12 @@ const ProductsTab = () => {
     });
     setTableData(updated);
   };
-  if (invoices.length === 0)
+  useEffect(() => {
+    if (!invoices || invoices.length === 0) return;
+    const allMissing = invoices.every((inv) => inv.products.length === 0);
+    setCheck(allMissing);
+  }, [invoices]);
+  if (invoices?.length === 0 || check)
     return (
       <>
         <InitialLoader />

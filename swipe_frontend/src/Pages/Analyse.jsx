@@ -11,7 +11,6 @@ import UploadBox from "../Components/FileUploader.jsx";
 const Analyse = () => {
   const [activeTab, setActiveTab] = useState("invoices");
   const invoices = useSelector((state) => state.invoices);
-  if (invoices) console.log(invoices);
   const contentVariants = {
     initial: { opacity: 0, y: 10 },
     animate: { opacity: 1, y: 0, transition: { duration: 0.4 } },

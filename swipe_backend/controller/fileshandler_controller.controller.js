@@ -12,10 +12,35 @@ const cleanGeminiJSON = (raw) => {
   raw = raw.replace(/[\u0000-\u001F]+/g, "");
   return raw;
 };
+
+const check_products = (data) => {
+  const dummy_prod = {
+    name: null,
+    quantity: null,
+    unitPrice: null,
+    unit: null,
+    discount: null,
+    taxableValue: null,
+    taxRate: null,
+    discountrate: null,
+    taxAmount: null,
+    priceWithTax: null,
+  };
+
+  return {
+    ...data,
+    invoices: data.invoices.map((inv) => {
+      if (!inv.products || inv.products.length === 0) {
+        return { ...inv, products: [dummy_prod] };
+      }
+      return inv;
+    }),
+  };
+};
+
 export const fileshandler_controller = async (req, res) => {
   try {
     const files = req.files;
-    console.log(files);
     if (!files || files.length === 0) {
       return res.status(400).json({ error: "No files uploaded" });
     }
@@ -131,6 +156,7 @@ GLOBAL RULES
 5. DO NOT hallucinate invoice numbers, totals, dates, etc.
 6. If unsure, return null.
 7. Return ONLY valid JSON. No extra text.
+8. If the file or text clearly looks like an invoice or bill, extract structured invoice data; otherwise return only: Please upload a valid invoice.
 
 Now extract the data.
 `;
@@ -138,434 +164,70 @@ Now extract the data.
     const contents = [prompt, ...fileParts];
 
     // ai integration
-    console.log("loading.......");
-    // const response = await ai.models.generateContent({
-    //   model: "gemini-2.5-flash",
-    //   contents,
-    // });
-    // const responseText =
-    //   response.candidates?.[0]?.content?.parts?.[0]?.text || "";
-    // let cleaned = cleanGeminiJSON(responseText);
-    // let extracted;
-    // try {
-    //   extracted = JSON.parse(cleaned);
-    // } catch (err) {
-    //   return res.status(200).json({
-    //     error: "Unable to parse invoice data",
-    //     rawResponse: cleaned,
-    //   });
-    // }
-    const dummyInvoices = {
-      message: "Dummy invoices loaded",
-      invoices: [
-        {
-          serialNumber: "INV001",
-          invoiceDate: "2025-01-10",
-          customerName: "Rahul Sharma",
-          customerPhone: "9876543210",
-          customerCompanyName: "Sharma Traders",
-          gstin: "27AAACX1234A1Z5",
-          totalAmount: 1180,
-          amountBeforeTax: 1000,
-          taxamount: 180,
-          paymentMethod: "UPI",
-          amountPending: 0,
-          status: "PAID",
-          createdBy: "SYSTEM",
-
-          products: [
-            {
-              name: "Nestle Maggie",
-              quantity: 2,
-              unitPrice: 40,
-              unit: "piece",
-              discount: 0,
-              taxableValue: 80,
-              taxRate: 18,
-              discountrate: 0,
-              taxAmount: 14.4,
-              priceWithTax: 94.4,
-            },
-            {
-              name: "Colgate Toothpaste",
-              quantity: 1,
-              unitPrice: 60,
-              unit: "piece",
-              discount: 0,
-              taxableValue: 60,
-              taxRate: 18,
-              discountrate: 0,
-              taxAmount: 10.8,
-              priceWithTax: 70.8,
-            },
-          ],
-        },
-
-        {
-          serialNumber: "INV002",
-          invoiceDate: "2025-01-12",
-          customerName: "Priya Verma",
-          customerPhone: "9123456780",
-          customerCompanyName: "Verma Enterprises",
-          gstin: "07AAACX5678B1Z2",
-          totalAmount: 2360,
-          amountBeforeTax: 2000,
-          taxamount: 360,
-          paymentMethod: "CASH",
-          amountPending: 200,
-          status: "PARTIAL",
-
-          products: [
-            {
-              name: "Macbook Cleaning Kit",
-              quantity: 100,
-              unitPrice: 1000,
-              unit: "piece",
-              discount: 0,
-              taxableValue: 1000,
-              taxRate: 18,
-              discountrate: 0,
-              taxAmount: 180,
-              priceWithTax: 1180,
-            },
-            {
-              name: "Laptop Stand",
-              quantity: 4,
-              unitPrice: 1000,
-              unit: "piece",
-              discount: 0,
-              taxableValue: 1000,
-              taxRate: 18,
-              discountrate: 0,
-              taxAmount: 180,
-              priceWithTax: 1180,
-            },
-            {
-              name: "Laptop Stand",
-              quantity: 5,
-              unitPrice: 1000,
-              unit: "piece",
-              discount: 0,
-              taxableValue: 1000,
-              taxRate: 18,
-              discountrate: 0,
-              taxAmount: 180,
-              priceWithTax: 1180,
-            },
-            {
-              name: "Laptop Stand",
-              quantity: 4,
-              unitPrice: 1000,
-              unit: "piece",
-              discount: 0,
-              taxableValue: 1000,
-              taxRate: 18,
-              discountrate: 0,
-              taxAmount: 180,
-              priceWithTax: 1180,
-            },
-            {
-              name: "Laptop Stand",
-              quantity: 10,
-              unitPrice: 1000,
-              unit: "piece",
-              discount: 0,
-              taxableValue: 1000,
-              taxRate: 18,
-              discountrate: 0,
-              taxAmount: 180,
-              priceWithTax: 1180,
-            },
-          ],
-        },
-
-        {
-          serialNumber: "INV003",
-          invoiceDate: "2025-01-12",
-          customerName: "aman Verma",
-          customerPhone: "9123456780",
-          customerCompanyName: "Verma Enterprises",
-          gstin: "07AAACX5678B1Z2",
-          totalAmount: 23600,
-          amountBeforeTax: 20000,
-          taxamount: 3600,
-          paymentMethod: "chut",
-          amountPending: "000",
-          status: "jaibhim",
-
-          products: [
-            {
-              name: "Macbook ",
-              quantity: 3,
-              unitPrice: 1000,
-              unit: "piece",
-              discount: 0,
-              taxableValue: 1000,
-              taxRate: 18,
-              discountrate: 0,
-              taxAmount: 180,
-              priceWithTax: 1180,
-            },
-            {
-              name: " Stand",
-              quantity: 2,
-              unitPrice: 1000,
-              unit: "piece",
-              discount: 0,
-              taxableValue: 1000,
-              taxRate: 18,
-              discountrate: 0,
-              taxAmount: 180,
-              priceWithTax: 1180,
-            },
-          ],
-        },
-        {
-          serialNumber: "INV004",
-          invoiceDate: "2025-01-12",
-          customerName: "aman Verma",
-          customerPhone: "9123456780",
-          customerCompanyName: "Verma Enterprises",
-          gstin: "07AAACX5678B1Z2",
-          totalAmount: 23600,
-          amountBeforeTax: 20000,
-          taxamount: 3600,
-          paymentMethod: "chut",
-          amountPending: "000",
-          status: "jaibhim",
-
-          products: [
-            {
-              name: "Macbook ",
-              quantity: 3,
-              unitPrice: 1000,
-              unit: "piece",
-              discount: 0,
-              taxableValue: 1000,
-              taxRate: 18,
-              discountrate: 0,
-              taxAmount: 180,
-              priceWithTax: 1180,
-            },
-            {
-              name: " Stand",
-              quantity: 2,
-              unitPrice: 1000,
-              unit: "piece",
-              discount: 0,
-              taxableValue: 1000,
-              taxRate: 18,
-              discountrate: 0,
-              taxAmount: 180,
-              priceWithTax: 1180,
-            },
-          ],
-        },
-        {
-          serialNumber: "INV005",
-          invoiceDate: "2025-01-12",
-          customerName: "aman Verma",
-          customerPhone: "9123456780",
-          customerCompanyName: "Verma Enterprises",
-          gstin: "07AAACX5678B1Z2",
-          totalAmount: 23600,
-          amountBeforeTax: 20000,
-          taxamount: 3600,
-          paymentMethod: "chut",
-          amountPending: "000",
-          status: "jaibhim",
-
-          products: [
-            {
-              name: "Macbook ",
-              quantity: 3,
-              unitPrice: 1000,
-              unit: "piece",
-              discount: 0,
-              taxableValue: 1000,
-              taxRate: 18,
-              discountrate: 0,
-              taxAmount: 180,
-              priceWithTax: 1180,
-            },
-            {
-              name: " Stand",
-              quantity: 2,
-              unitPrice: 1000,
-              unit: "piece",
-              discount: 0,
-              taxableValue: 1000,
-              taxRate: 18,
-              discountrate: 0,
-              taxAmount: 180,
-              priceWithTax: 1180,
-            },
-          ],
-        },
-        {
-          serialNumber: "INV006",
-          invoiceDate: "2025-01-12",
-          customerName: null,
-          customerPhone: "9123456780",
-          customerCompanyName: "Verma Enterprises",
-          gstin: null,
-          totalAmount: 2360,
-          amountBeforeTax: 2000,
-          taxamount: 360,
-          paymentMethod: "CASH",
-          amountPending: 200,
-          status: "PARTIAL",
-
-          products: [
-            {
-              name: "Macbook Cleaning Kit",
-              quantity: 100,
-              unitPrice: 1000,
-              unit: "piece",
-              discount: 0,
-              taxableValue: 1000,
-              taxRate: 18,
-              discountrate: 0,
-              taxAmount: 180,
-              priceWithTax: 1180,
-            },
-            {
-              name: null,
-              quantity: 4,
-              unitPrice: 1000,
-              unit: "piece",
-              discount: 0,
-              taxableValue: 1000,
-              taxRate: 18,
-              discountrate: 0,
-              taxAmount: 180,
-              priceWithTax: 1180,
-            },
-            {
-              name: "Laptop Stand",
-              quantity: 5,
-              unitPrice: 1000,
-              unit: "piece",
-              discount: 0,
-              taxableValue: 1000,
-              taxRate: 18,
-              discountrate: 0,
-              taxAmount: 180,
-              priceWithTax: 1180,
-            },
-            {
-              name: "Laptop Stand",
-              quantity: 4,
-              unitPrice: 1000,
-              unit: "piece",
-              discount: 0,
-              taxableValue: 1000,
-              taxRate: 18,
-              discountrate: 0,
-              taxAmount: 180,
-              priceWithTax: 1180,
-            },
-            {
-              name: "Laptop Stand",
-              quantity: 10,
-              unitPrice: 1000,
-              unit: "piece",
-              discount: 0,
-              taxableValue: 1000,
-              taxRate: 18,
-              discountrate: 0,
-              taxAmount: 180,
-              priceWithTax: 1180,
-            },
-          ],
-        },
-        {
-          serialNumber: "INV010",
-          invoiceDate: "2025-01-12",
-          customerName: null,
-          customerPhone: "9123456780",
-          customerCompanyName: "Verma Enterprises",
-          gstin: "07AAACX5678B1Z2",
-          totalAmount: 2360,
-          amountBeforeTax: 2000,
-          taxamount: 360,
-          paymentMethod: "CASH",
-          amountPending: 200,
-          status: "PARTIAL",
-
-          products: [
-            {
-              name: null,
-              quantity: 100,
-              unitPrice: 1000,
-              unit: "piece",
-              discount: 0,
-              taxableValue: 1000,
-              taxRate: 18,
-              discountrate: 0,
-              taxAmount: 180,
-              priceWithTax: 1180,
-            },
-            {
-              name: "Laptop Stand",
-              quantity: 4,
-              unitPrice: 1000,
-              unit: "piece",
-              discount: 0,
-              taxableValue: 1000,
-              taxRate: 18,
-              discountrate: 0,
-              taxAmount: 180,
-              priceWithTax: 1180,
-            },
-            {
-              name: "Laptop Stand",
-              quantity: 5,
-              unitPrice: 1000,
-              unit: "piece",
-              discount: 0,
-              taxableValue: 1000,
-              taxRate: 18,
-              discountrate: 0,
-              taxAmount: 180,
-              priceWithTax: 1180,
-            },
-            {
-              name: "Laptop Stand",
-              quantity: null,
-              unitPrice: 1000,
-              unit: "piece",
-              discount: 0,
-              taxableValue: 1000,
-              taxRate: 18,
-              discountrate: 0,
-              taxAmount: 180,
-              priceWithTax: 1180,
-            },
-            {
-              name: null,
-              quantity: 10,
-              unitPrice: 1000,
-              unit: "piece",
-              discount: 0,
-              taxableValue: 1000,
-              taxRate: 18,
-              discountrate: 0,
-              taxAmount: 180,
-              priceWithTax: 1180,
-            },
-          ],
-        },
-      ],
-    };
-    console.log("donnnnnn");
-    function sleep(ms) {
-      return new Promise((resolve) => setTimeout(resolve, ms));
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents,
+    });
+    const responseText =
+      response.candidates?.[0]?.content?.parts?.[0]?.text || "";
+    let cleaned = cleanGeminiJSON(responseText);
+    let extracted;
+    try {
+      extracted = JSON.parse(cleaned);
+    } catch (err) {
+      return res.status(500).json({
+        error: "Unable to parse invoice data, Please upload a valid invoice",
+        rawResponse: cleaned,
+      });
     }
-    await sleep(5000);
+    // const dummyInvoices = {
+    //   message: "Dummy invoices loaded",
+    //   invoices: [
+    //     {
+    //       serialNumber: "INV001",
+    //       invoiceDate: "2025-01-10",
+    //       customerName: "Rahul Sharma",
+    //       customerPhone: "9876543210",
+    //       customerCompanyName: "Sharma Traders",
+    //       gstin: "27AAACX1234A1Z5",
+    //       totalAmount: 1180,
+    //       amountBeforeTax: 1000,
+    //       taxamount: 180,
+    //       paymentMethod: "UPI",
+    //       amountPending: 0,
+    //       status: "PAID",
+    //       createdBy: "SYSTEM",
+    //       products: [],
+    //     },
+
+    //     {
+    //       serialNumber: "INV002",
+    //       invoiceDate: "2025-01-12",
+    //       customerName: "Priya Verma",
+    //       customerPhone: "9123456780",
+    //       customerCompanyName: "Verma Enterprises",
+    //       gstin: "07AAACX5678B1Z2",
+    //       totalAmount: 2360,
+    //       amountBeforeTax: 2000,
+    //       taxamount: 360,
+    //       paymentMethod: "CASH",
+    //       amountPending: 200,
+    //       status: "PARTIAL",
+
+    //       products: [],
+    //     },
+    //   ],
+    // };
+    // console.log("donnnnnn");
+    // function sleep(ms) {
+    //   return new Promise((resolve) => setTimeout(resolve, ms));
+    // }
+    // await sleep(5000);
+    const result = check_products(extracted);
+    console.log(result);
     return res.status(200).json({
       message: "Extraction successful",
-      data: dummyInvoices,
+      data: result,
     });
   } catch (error) {
     console.error("Gemini error:", error);
