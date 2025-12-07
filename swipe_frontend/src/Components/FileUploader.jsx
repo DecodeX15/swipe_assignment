@@ -1,11 +1,41 @@
 import { useState } from "react";
+import axios from "axios";
+import { useDispatch } from "react-redux";
+import { setInvoices } from "../features/invoicesSlice";
 
 const UploadBox = () => {
   const [selectedFiles, setSelectedFiles] = useState([]);
+  const dispatch = useDispatch();
+  const handleFileChange = async (e) => {
+    try {
+      const files = Array.from(e.target.files);
 
-  const handleFileChange = (e) => {
-    const files = Array.from(e.target.files);
-    setSelectedFiles(files);
+      if (!files || files.length === 0) {
+        alert("No files selected");
+        return;
+      }
+      const formData = new FormData();
+      files.forEach((file) => {
+        formData.append("files", file); // SAME KEY multiple times
+      });
+      console.log("loadingggggg");
+      const res = await axios.post(
+        "http://localhost:5000/api/files_analysis",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      console.log("Response:", res.data);
+      alert(res.data.message || "Files uploaded successfully");
+      dispatch(setInvoices(res?.data?.data?.invoices || []));
+      setSelectedFiles(files);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -23,7 +53,6 @@ const UploadBox = () => {
                    file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold 
                    file:bg-blue-600 file:text-white hover:file:bg-blue-700"
       />
-
       {/* Show Selected File Names */}
       {selectedFiles.length > 0 && (
         <div className="mt-3">

@@ -1,34 +1,95 @@
+import { useSelector, useDispatch } from "react-redux";
+import {
+  useReactTable,
+  getCoreRowModel,
+  flexRender,
+} from "@tanstack/react-table";
+
 const ProductsTab = () => {
+  const dispatch = useDispatch();
+  const invoices = useSelector((state) => state.invoices.invoices || []);
+
+  const allProducts = invoices.flatMap((inv) =>
+    inv.products.map((p, idx) => ({
+      ...p,
+      serialNumber: inv.serialNumber,
+      productIndex: idx,
+    }))
+  );
+
+  const columns = [
+    {
+      header: "Name",
+      accessorKey: "name",
+      cell: ({ row, getValue }) => (
+        <input
+          className="bg-transparent border px-1 rounded"
+          defaultValue={getValue()}
+          onBlur={(e) => console.log(e)}
+        />
+      ),
+    },
+    {
+      header: "Quantity",
+      accessorKey: "quantity",
+      cell: ({ row, getValue }) => (
+        <input
+          type="number"
+          className="bg-transparent border px-1 rounded"
+          defaultValue={getValue()}
+          onBlur={(e) => console.log(e)}
+        />
+      ),
+    },
+    {
+      header: "Unit Price",
+      accessorKey: "unitPrice",
+    },
+    {
+      header: "Tax Rate",
+      accessorKey: "taxRate",
+    },
+    {
+      header: "Price With Tax",
+      accessorKey: "priceWithTax",
+    },
+  ];
+
+  const table = useReactTable({
+    data: allProducts,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+  });
+
   return (
-    <div className="p-4">
-      <h2 className="text-xl font-semibold mb-4 text-white dark:text-white">
-        Products
-      </h2>
+    <div className="text-white">
+      <h2 className="text-xl mb-4">Products</h2>
 
-      {/* Table Placeholder */}
-      <div className="overflow-x-auto">
-        <table className="w-full border-collapse">
-          <thead>
-            <tr className="text-left border-b border-gray-500 text-white">
-              <th className="p-2">Name</th>
-              <th className="p-2">Quantity</th>
-              <th className="p-2">Unit Price</th>
-              <th className="p-2">Tax</th>
-              <th className="p-2">Price w/ Tax</th>
+      <table className="w-full border-collapse">
+        <thead>
+          {table.getHeaderGroups().map((hg) => (
+            <tr key={hg.id} className="border-b border-gray-500">
+              {hg.headers.map((h) => (
+                <th key={h.id} className="p-2">
+                  {h.column.columnDef.header}
+                </th>
+              ))}
             </tr>
-          </thead>
+          ))}
+        </thead>
 
-          <tbody className="text-white">
-            <tr>
-              <td className="p-2">—</td>
-              <td className="p-2">—</td>
-              <td className="p-2">—</td>
-              <td className="p-2">—</td>
-              <td className="p-2">—</td>
+        <tbody>
+          {table.getRowModel().rows.map((row) => (
+            <tr key={row.id} className="border-b border-gray-700">
+              {row.getVisibleCells().map((cell) => (
+                <td key={cell.id} className="p-2">
+                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                </td>
+              ))}
             </tr>
-          </tbody>
-        </table>
-      </div>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 };
