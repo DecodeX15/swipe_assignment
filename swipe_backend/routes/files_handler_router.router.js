@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { fileshandler_controller } from "../Controller/fileshandler_controller.controller.js";
+import { fileshandler_controller } from "../controller/fileshandler_controller.controller.js";
 import { upload } from "../middleware/multer.middleware.js";
 
 const fileshandler_router = Router();
