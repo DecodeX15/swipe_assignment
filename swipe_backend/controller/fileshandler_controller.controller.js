@@ -131,7 +131,7 @@ GLOBAL RULES
       "paymentMethod": null,
       "amountPending": null,
       "status": null,
-      "Created By":"null",
+      "Created By":null,
 
       "products": [
         {
