@@ -20,7 +20,7 @@ const UploadBox = () => {
   const handleFileChange = async (e) => {
     const files = Array.from(e.target.files);
     if (!files || files.length === 0) {
-      alert("No files selected");
+      toast.error("No files selected");
       return;
     }
     setLoading(true);
@@ -40,7 +40,7 @@ const UploadBox = () => {
         formData.append("files", file);
       });
       const res = await axios.post(
-        "http://localhost:5000/api/files_analysis",
+        `${import.meta.env.VITE_BACKEND_ENDOINT}/api/files_analysis`,
         formData,
         {
           headers: {
@@ -58,7 +58,8 @@ const UploadBox = () => {
     } catch (error) {
       console.error("Upload error:", error);
       toast.error(
-        "Server issue : " + error.response?.data?.error || "An error occurred during upload."
+        "Server issue : " + error.response?.data?.error ||
+          "An error occurred during upload."
       );
       console.log(error.response?.data?.error);
       setSelectedFiles([]);

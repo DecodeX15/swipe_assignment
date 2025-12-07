@@ -1,6 +1,6 @@
 import { GoogleGenAI } from "@google/genai";
 import XLSX from "xlsx";
-
+console.log(process.env.GEMINI_API_KEY);
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 const cleanGeminiJSON = (raw) => {
   if (!raw) return raw;
