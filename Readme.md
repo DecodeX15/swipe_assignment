@@ -180,6 +180,24 @@ This workflow ensures a seamless, AI-powered extraction of structured invoice da
 
 ---
 
+## Future Features (Planned)
+
+These features are not yet implemented, but are planned for future releases:
+
+- **Download as CSV for Each Tab**
+  - Allow users to export invoice, product, and customer data as CSV files directly from each tab in the frontend.
+
+- **Database Integration**
+  - Add persistent storage (e.g., MongoDB, PostgreSQL) to save extracted and edited data for long-term access and analytics.
+
+- **Enhanced Error Handling & Feedback**
+  - Provide more detailed feedback and suggestions when extraction fails or data is missing.
+
+- **Dashboard & Analytics**
+  - Add a dashboard for visualizing key metrics, trends, and summaries from extracted data.
+
+---
+
 ## License
 
 MIT
