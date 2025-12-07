@@ -1,6 +1,7 @@
 import { useSelector, useDispatch } from "react-redux";
 import { useEffect, useState } from "react";
 import { setInvoices } from "../features/invoicesSlice";
+import InitialLoader from "./Loader.jsx";
 
 const InvoiceTab = () => {
   const dispatch = useDispatch();
@@ -49,7 +50,12 @@ const InvoiceTab = () => {
     `bg-black border px-2 py-1 rounded  ${
       val == null ? "border-red-500" : "border-green-500"
     }`;
-
+  if (invoices.length === 0)
+    return (
+      <>
+        <InitialLoader />
+      </>
+    );
   return (
     <div className="text-white">
       <h2 className="text-2xl font-semibold mb-6">Invoices</h2>

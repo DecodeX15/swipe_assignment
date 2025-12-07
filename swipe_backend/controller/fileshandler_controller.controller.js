@@ -402,7 +402,7 @@ Now extract the data.
             },
           ],
         },
-         {
+        {
           serialNumber: "INV006",
           invoiceDate: "2025-01-12",
           customerName: null,
@@ -479,7 +479,7 @@ Now extract the data.
             },
           ],
         },
-         {
+        {
           serialNumber: "INV010",
           invoiceDate: "2025-01-12",
           customerName: null,
@@ -559,6 +559,10 @@ Now extract the data.
       ],
     };
     console.log("donnnnnn");
+    function sleep(ms) {
+      return new Promise((resolve) => setTimeout(resolve, ms));
+    }
+    await sleep(5000);
     return res.status(200).json({
       message: "Extraction successful",
       data: dummyInvoices,

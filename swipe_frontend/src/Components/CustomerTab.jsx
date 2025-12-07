@@ -1,7 +1,7 @@
 import { useSelector, useDispatch } from "react-redux";
 import { useEffect, useState } from "react";
 import { setInvoices } from "../features/invoicesSlice";
-
+import InitialLoader from "./Loader.jsx";
 const CustomersTab = () => {
   const dispatch = useDispatch();
   const invoices = useSelector((state) => state.invoices.invoices || []);
@@ -30,8 +30,12 @@ const CustomersTab = () => {
     );
     setTableData(updated);
   };
-
-  // derive a customer list per invoice (we keep invoice rows so serial shows)
+  if (invoices.length === 0)
+    return (
+      <>
+        <InitialLoader />
+      </>
+    );
   return (
     <div className="text-white">
       <h2 className="text-2xl font-semibold mb-6">Customers</h2>
@@ -62,7 +66,11 @@ const CustomersTab = () => {
                     value={inv.customerName ?? ""}
                     placeholder={inv.customerName == null ? "❗missing" : ""}
                     onChange={(e) =>
-                      updatefield(inv.serialNumber, "customerName", e.target.value)
+                      updatefield(
+                        inv.serialNumber,
+                        "customerName",
+                        e.target.value
+                      )
                     }
                   />
                 </td>
@@ -73,7 +81,11 @@ const CustomersTab = () => {
                     value={inv.customerPhone ?? ""}
                     placeholder={inv.customerPhone == null ? "❗missing" : ""}
                     onChange={(e) =>
-                      updatefield(inv.serialNumber, "customerPhone", e.target.value)
+                      updatefield(
+                        inv.serialNumber,
+                        "customerPhone",
+                        e.target.value
+                      )
                     }
                   />
                 </td>
@@ -82,9 +94,15 @@ const CustomersTab = () => {
                   <input
                     className={inputClass(inv.customerCompanyName)}
                     value={inv.customerCompanyName ?? ""}
-                    placeholder={inv.customerCompanyName == null ? "❗missing" : ""}
+                    placeholder={
+                      inv.customerCompanyName == null ? "❗missing" : ""
+                    }
                     onChange={(e) =>
-                      updatefield(inv.serialNumber, "customerCompanyName", e.target.value)
+                      updatefield(
+                        inv.serialNumber,
+                        "customerCompanyName",
+                        e.target.value
+                      )
                     }
                   />
                 </td>
@@ -106,7 +124,11 @@ const CustomersTab = () => {
                     value={inv.totalAmount ?? ""}
                     placeholder={inv.totalAmount == null ? "❗missing" : ""}
                     onChange={(e) =>
-                      updatefield(inv.serialNumber, "totalAmount", e.target.value)
+                      updatefield(
+                        inv.serialNumber,
+                        "totalAmount",
+                        e.target.value
+                      )
                     }
                   />
                 </td>
@@ -117,7 +139,11 @@ const CustomersTab = () => {
                     value={inv.amountPending ?? ""}
                     placeholder={inv.amountPending == null ? "❗missing" : ""}
                     onChange={(e) =>
-                      updatefield(inv.serialNumber, "amountPending", e.target.value)
+                      updatefield(
+                        inv.serialNumber,
+                        "amountPending",
+                        e.target.value
+                      )
                     }
                   />
                 </td>

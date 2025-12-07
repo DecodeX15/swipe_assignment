@@ -1,18 +1,16 @@
 import { useSelector, useDispatch } from "react-redux";
 import { useEffect, useState } from "react";
 import { setInvoices } from "../features/invoicesSlice";
-
+import InitialLoader from "./Loader.jsx";
 const ProductsTab = () => {
   const dispatch = useDispatch();
   const invoices = useSelector((state) => state.invoices.invoices || []);
   const [tableData, setTableData] = useState([]);
 
-  // load invoices into local editable state
   useEffect(() => {
     setTableData(invoices);
   }, [invoices]);
 
-  // autosave (debounced)
   useEffect(() => {
     const t = setTimeout(() => {
       dispatch(setInvoices(tableData));
@@ -20,13 +18,11 @@ const ProductsTab = () => {
     return () => clearTimeout(t);
   }, [tableData, dispatch]);
 
-  // utility for input border coloring
   const inputClass = (val, extra = "") =>
     `bg-black border px-2 py-1 rounded ${extra} ${
       val == null ? "border-red-500" : "border-green-500"
     }`;
 
-  // update product field inside the invoice identified by serial number
   const updateProduct = (serial, productIndex, field, value) => {
     const updated = tableData.map((inv) => {
       if (inv.serialNumber !== serial) return inv;
@@ -37,7 +33,12 @@ const ProductsTab = () => {
     });
     setTableData(updated);
   };
-
+  if (invoices.length === 0)
+    return (
+      <>
+        <InitialLoader />
+      </>
+    );
   return (
     <div className="text-white">
       <h2 className="text-2xl font-semibold mb-6">Products</h2>
@@ -62,7 +63,10 @@ const ProductsTab = () => {
           <tbody>
             {tableData.map((inv) =>
               inv.products.map((p, idx) => (
-                <tr key={`${inv.serialNumber}-${idx}`} className="border-b border-gray-700">
+                <tr
+                  key={`${inv.serialNumber}-${idx}`}
+                  className="border-b border-gray-700"
+                >
                   {/* Serial Number */}
                   <td className="px-6 py-2">{inv.serialNumber}</td>
 
@@ -73,7 +77,12 @@ const ProductsTab = () => {
                       value={p.name ?? ""}
                       placeholder={p.name == null ? "❗missing" : ""}
                       onChange={(e) =>
-                        updateProduct(inv.serialNumber, idx, "name", e.target.value)
+                        updateProduct(
+                          inv.serialNumber,
+                          idx,
+                          "name",
+                          e.target.value
+                        )
                       }
                     />
                   </td>
@@ -85,7 +94,12 @@ const ProductsTab = () => {
                       value={p.quantity ?? ""}
                       placeholder={p.quantity == null ? "❗missing" : ""}
                       onChange={(e) =>
-                        updateProduct(inv.serialNumber, idx, "quantity", e.target.value)
+                        updateProduct(
+                          inv.serialNumber,
+                          idx,
+                          "quantity",
+                          e.target.value
+                        )
                       }
                     />
                   </td>
@@ -97,7 +111,12 @@ const ProductsTab = () => {
                       value={p.unitPrice ?? ""}
                       placeholder={p.unitPrice == null ? "❗missing" : ""}
                       onChange={(e) =>
-                        updateProduct(inv.serialNumber, idx, "unitPrice", e.target.value)
+                        updateProduct(
+                          inv.serialNumber,
+                          idx,
+                          "unitPrice",
+                          e.target.value
+                        )
                       }
                     />
                   </td>
@@ -109,7 +128,12 @@ const ProductsTab = () => {
                       value={p.unit ?? ""}
                       placeholder={p.unit == null ? "❗missing" : ""}
                       onChange={(e) =>
-                        updateProduct(inv.serialNumber, idx, "unit", e.target.value)
+                        updateProduct(
+                          inv.serialNumber,
+                          idx,
+                          "unit",
+                          e.target.value
+                        )
                       }
                     />
                   </td>
@@ -121,7 +145,12 @@ const ProductsTab = () => {
                       value={p.discount ?? ""}
                       placeholder={p.discount == null ? "❗missing" : ""}
                       onChange={(e) =>
-                        updateProduct(inv.serialNumber, idx, "discount", e.target.value)
+                        updateProduct(
+                          inv.serialNumber,
+                          idx,
+                          "discount",
+                          e.target.value
+                        )
                       }
                     />
                   </td>
@@ -133,7 +162,12 @@ const ProductsTab = () => {
                       value={p.taxableValue ?? ""}
                       placeholder={p.taxableValue == null ? "❗missing" : ""}
                       onChange={(e) =>
-                        updateProduct(inv.serialNumber, idx, "taxableValue", e.target.value)
+                        updateProduct(
+                          inv.serialNumber,
+                          idx,
+                          "taxableValue",
+                          e.target.value
+                        )
                       }
                     />
                   </td>
@@ -145,7 +179,12 @@ const ProductsTab = () => {
                       value={p.taxRate ?? ""}
                       placeholder={p.taxRate == null ? "❗missing" : ""}
                       onChange={(e) =>
-                        updateProduct(inv.serialNumber, idx, "taxRate", e.target.value)
+                        updateProduct(
+                          inv.serialNumber,
+                          idx,
+                          "taxRate",
+                          e.target.value
+                        )
                       }
                     />
                   </td>
@@ -157,7 +196,12 @@ const ProductsTab = () => {
                       value={p.taxAmount ?? ""}
                       placeholder={p.taxAmount == null ? "❗missing" : ""}
                       onChange={(e) =>
-                        updateProduct(inv.serialNumber, idx, "taxAmount", e.target.value)
+                        updateProduct(
+                          inv.serialNumber,
+                          idx,
+                          "taxAmount",
+                          e.target.value
+                        )
                       }
                     />
                   </td>
@@ -169,7 +213,12 @@ const ProductsTab = () => {
                       value={p.priceWithTax ?? ""}
                       placeholder={p.priceWithTax == null ? "❗missing" : ""}
                       onChange={(e) =>
-                        updateProduct(inv.serialNumber, idx, "priceWithTax", e.target.value)
+                        updateProduct(
+                          inv.serialNumber,
+                          idx,
+                          "priceWithTax",
+                          e.target.value
+                        )
                       }
                     />
                   </td>
