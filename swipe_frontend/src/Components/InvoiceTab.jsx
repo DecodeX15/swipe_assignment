@@ -97,7 +97,9 @@ const InvoiceTab = () => {
                       <input
                         className={inputClass(inv.customerName)}
                         value={inv.customerName ?? ""}
-                        placeholder={inv.customerName == null ? "Missing" : ""}
+                        placeholder={
+                          inv.customerName == null ? "❗missing" : ""
+                        }
                         onChange={(e) =>
                           updatefield(
                             inv.serialNumber,
@@ -115,7 +117,7 @@ const InvoiceTab = () => {
                       <input
                         className={inputClass(inv.gstin)}
                         value={inv.gstin ?? ""}
-                        placeholder={inv.gstin == null ? "Missing" : ""}
+                        placeholder={inv.gstin == null ? "❗missing" : ""}
                         onChange={(e) =>
                           updatefield(inv.serialNumber, "gstin", e.target.value)
                         }
@@ -128,7 +130,7 @@ const InvoiceTab = () => {
                     <input
                       className={inputClass(p.name)}
                       value={p.name ?? ""}
-                      placeholder={p.name == null ? "Missing" : ""}
+                      placeholder={p.name == null ? "❗missing" : ""}
                       onChange={(e) =>
                         updateProduct(
                           inv.serialNumber,
@@ -143,9 +145,9 @@ const InvoiceTab = () => {
                   {/* QTY */}
                   <td className="px-6 py-2">
                     <input
-                      className={`${inputClass(p.quantity)} w-20`}
+                      className={`${inputClass(p.quantity)} w-25`}
                       value={p.quantity ?? ""}
-                      placeholder={p.quantity == null ? "Missing" : ""}
+                      placeholder={p.quantity == null ? "❗missing" : ""}
                       onChange={(e) =>
                         updateProduct(
                           inv.serialNumber,
@@ -160,9 +162,9 @@ const InvoiceTab = () => {
                   {/* TAX % */}
                   <td className="px-6 py-2">
                     <input
-                      className={`${inputClass(p.taxRate)} w-20`}
+                      className={`${inputClass(p.taxRate)} w-25`}
                       value={p.taxRate ?? ""}
-                      placeholder={p.taxRate == null ? "Missing" : ""}
+                      placeholder={p.taxRate == null ? "❗missing" : ""}
                       onChange={(e) =>
                         updateProduct(
                           inv.serialNumber,
@@ -177,9 +179,9 @@ const InvoiceTab = () => {
                   {/* TAX AMOUNT */}
                   <td className="px-6 py-2">
                     <input
-                      className={`${inputClass(p.taxAmount)} w-20`}
+                      className={`${inputClass(p.taxAmount)} w-25`}
                       value={p.taxAmount ?? ""}
-                      placeholder={p.taxAmount == null ? "Missing" : ""}
+                      placeholder={p.taxAmount == null ? "❗missing" : ""}
                       onChange={(e) =>
                         updateProduct(
                           inv.serialNumber,
@@ -196,7 +198,7 @@ const InvoiceTab = () => {
                     <input
                       className={`${inputClass(p.priceWithTax)} w-24`}
                       value={p.priceWithTax ?? ""}
-                      placeholder={p.priceWithTax == null ? "Missing" : ""}
+                      placeholder={p.priceWithTax == null ? "❗missing" : ""}
                       onChange={(e) =>
                         updateProduct(
                           inv.serialNumber,
@@ -212,10 +214,10 @@ const InvoiceTab = () => {
                   <td className="px-6 py-2">
                     {index === 0 && (
                       <input
-                        className={`${inputClass(inv.amountBeforeTax)} w-20`}
+                        className={`${inputClass(inv.amountBeforeTax)} w-25`}
                         value={inv.amountBeforeTax ?? ""}
                         placeholder={
-                          inv.amountBeforeTax == null ? "Missing" : ""
+                          inv.amountBeforeTax == null ? "❗missing" : ""
                         }
                         onChange={(e) =>
                           updatefield(
@@ -232,9 +234,9 @@ const InvoiceTab = () => {
                   <td className="px-6 py-2">
                     {index === 0 && (
                       <input
-                        className={`${inputClass(inv.taxamount)} w-20`}
+                        className={`${inputClass(inv.taxamount)} w-25`}
                         value={inv.taxamount ?? ""}
-                        placeholder={inv.taxamount == null ? "Missing" : ""}
+                        placeholder={inv.taxamount == null ? "❗missing" : ""}
                         onChange={(e) =>
                           updatefield(
                             inv.serialNumber,
@@ -250,9 +252,9 @@ const InvoiceTab = () => {
                   <td className="px-6 py-2">
                     {index === 0 && (
                       <input
-                        className={`${inputClass(inv.totalAmount)} w-20`}
+                        className={`${inputClass(inv.totalAmount)} w-25`}
                         value={inv.totalAmount ?? ""}
-                        placeholder={inv.totalAmount == null ? "Missing" : ""}
+                        placeholder={inv.totalAmount == null ? "❗missing" : ""}
                         onChange={(e) =>
                           updatefield(
                             inv.serialNumber,
@@ -268,9 +270,11 @@ const InvoiceTab = () => {
                   <td className="px-6 py-2">
                     {index === 0 && (
                       <input
-                        className={`${inputClass(inv.amountPending)} w-20`}
+                        className={`${inputClass(inv.amountPending)} w-25`}
                         value={inv.amountPending ?? ""}
-                        placeholder={inv.amountPending == null ? "Missing" : ""}
+                        placeholder={
+                          inv.amountPending == null ? "❗missing" : ""
+                        }
                         onChange={(e) =>
                           updatefield(
                             inv.serialNumber,
@@ -288,7 +292,9 @@ const InvoiceTab = () => {
                       <input
                         className={`${inputClass(inv.paymentMethod)} w-24`}
                         value={inv.paymentMethod ?? ""}
-                        placeholder={inv.paymentMethod == null ? "Missing" : ""}
+                        placeholder={
+                          inv.paymentMethod == null ? "❗missing" : ""
+                        }
                         onChange={(e) =>
                           updatefield(
                             inv.serialNumber,
@@ -306,7 +312,7 @@ const InvoiceTab = () => {
                       <input
                         className={`${inputClass(inv.status)} w-25`}
                         value={inv.status ?? ""}
-                        placeholder={inv.status == null ? "Missing" : ""}
+                        placeholder={inv.status == null ? "❗missing" : ""}
                         onChange={(e) =>
                           updatefield(
                             inv.serialNumber,
@@ -324,7 +330,7 @@ const InvoiceTab = () => {
                       <input
                         className={`${inputClass(inv.createdBy)} w-25`}
                         value={inv.createdBy ?? ""}
-                        placeholder={inv.createdBy == null ? "Missing" : ""}
+                        placeholder={inv.createdBy == null ? "❗missing" : ""}
                         onChange={(e) =>
                           updatefield(
                             inv.serialNumber,
@@ -339,18 +345,11 @@ const InvoiceTab = () => {
                   {/* DATE */}
                   <td className="px-2 py-2">
                     {index === 0 && (
-                      <input
-                        type="date"
-                        className={`${inputClass(inv.createdBy)} w-35`}
-                        value={inv.invoiceDate ?? ""}
-                        onChange={(e) =>
-                          updatefield(
-                            inv.serialNumber,
-                            "invoiceDate",
-                            e.target.value
-                          )
-                        }
-                      />
+                      <>
+                        <div className="bg-black px-2 py-1 rounded">
+                          {inv.invoiceDate}
+                        </div>
+                      </>
                     )}
                   </td>
                 </tr>
