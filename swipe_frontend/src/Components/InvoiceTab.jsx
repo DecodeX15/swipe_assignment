@@ -48,8 +48,8 @@ const InvoiceTab = () => {
 
     return {
       ...p,
-      taxableValue: amountBeforeTax, 
-      amountBeforeTax, 
+      taxableValue: amountBeforeTax,
+      amountBeforeTax,
       taxAmount,
       priceWithTax,
     };
@@ -73,8 +73,7 @@ const InvoiceTab = () => {
       totalAmount: amountBeforeTax + taxamount,
     };
   };
-
-  const BASE_FIELDS = ["quantity", "unitPrice", "taxRate"];
+  const BASE_FIELDS = ["quantity", "unitPrice", "taxRate", "discount"];
 
   const updateProduct = (serial, index, field, value) => {
     const updated = tableData.map((inv) => {
@@ -119,6 +118,7 @@ const InvoiceTab = () => {
               <th className="px-6 py-2">Product</th>
               <th className="px-6 py-2">Qty</th>
               <th className="px-6 py-2">Unit Price</th>
+              <th className="px-6 py-2">Discount</th>
               <th className="px-6 py-2">Tax %</th>
               <th className="px-6 py-2">Tax Amt</th>
               <th className="px-6 py-2">Price w/Tax</th>
@@ -211,6 +211,21 @@ const InvoiceTab = () => {
                           inv.serialNumber,
                           index,
                           "unitPrice",
+                          e.target.value
+                        )
+                      }
+                    />
+                  </td>
+
+                  <td className="px-6 py-2">
+                    <input
+                      className={inputClass(p.discount)}
+                      value={p.discount ?? ""}
+                      onChange={(e) =>
+                        updateProduct(
+                          inv.serialNumber,
+                          index,
+                          "discount",
                           e.target.value
                         )
                       }

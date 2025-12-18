@@ -19,52 +19,46 @@ const UploadBox = () => {
   ];
   const handleFileChange = async (e) => {
     const files = Array.from(e.target.files);
+
     if (!files || files.length === 0) {
       toast.error("No files selected");
       return;
     }
+
     setLoading(true);
+
     const invalidFiles = files.filter(
       (file) => !allowedTypes.includes(file.type)
     );
+
     if (invalidFiles.length > 0) {
       setLoading(false);
-      toast.error(
-        "Invalid file selected! Allowed: PDF, JPG, PNG, XLS, XLSX, CSV"
-      );
+      toast.error("Invalid file selected!");
+      e.target.value = null; 
       return;
     }
+
     try {
       const formData = new FormData();
       files.forEach((file) => {
         formData.append("files", file);
       });
+
       const res = await axios.post(
         `${import.meta.env.VITE_BACKEND_ENDOINT}/api/files_analysis`,
         formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
+        { headers: { "Content-Type": "multipart/form-data" } }
       );
 
-      console.log("Response:", res.data);
-      toast.success(
-        res?.message || "Files uploaded and analyzed successfully!"
-      );
       dispatch(setInvoices(res?.data?.data?.invoices || []));
       setSelectedFiles(files);
+      toast.success("Files uploaded and analyzed successfully!");
     } catch (error) {
-      console.error("Upload error:", error);
-      toast.error(
-        "Server issue : " + error.response?.data?.error ||
-          "An error occurred during upload."
-      );
-      console.log(error.response?.data?.error);
+      toast.error("Upload failed");
       setSelectedFiles([]);
     } finally {
       setLoading(false);
+      e.target.value = null; 
     }
   };
 
@@ -108,7 +102,7 @@ const UploadBox = () => {
         </div>
       )}
       <label className="block text-lg font-bold text-white mb-2">
-        📂 Upload Documents for Analysis
+        Upload Documents for Analysis
       </label>
       <motion.div
         className="relative border-2 border-dashed border-gray-500 dark:border-gray-600 rounded-xl p-6 cursor-pointer hover:border-blue-500 transition-colors duration-300"
@@ -148,7 +142,7 @@ const UploadBox = () => {
         </div>
       </motion.div>
 
-      {/* 📁 Animated Selected File List */}
+      {/* Animated Selected File List */}
       {selectedFiles.length > 0 && (
         <motion.div
           className="mt-4 p-4 bg-gray-800 dark:bg-gray-900 rounded-lg"
@@ -157,7 +151,7 @@ const UploadBox = () => {
           transition={{ staggerChildren: 0.05 }}
         >
           <p className="text-teal-400 font-bold mb-2 flex items-center">
-            <span className="mr-2">✨</span> Files Ready for Upload:
+            <span className="mr-2"></span> Files Ready for Upload:
           </p>
           <ul className="space-y-1">
             {selectedFiles.map((file, index) => (
