@@ -55,11 +55,7 @@ const UploadBox = () => {
       toast.success("Files uploaded and analyzed successfully!");
     } catch (error) {
       console.log(error);
-      toast.error(
-        error?.response?.data?.error ||
-          error.message ||
-          "An error occurred during file upload."
-      );
+      toast.error("You exceeded your current quota, please check your plan and billing details.");
       setSelectedFiles([]);
     } finally {
       setLoading(false);

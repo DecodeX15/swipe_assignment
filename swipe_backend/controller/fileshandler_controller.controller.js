@@ -224,7 +224,6 @@ Now extract the data.
     // }
     // await sleep(5000);
     const result = check_products(extracted);
-    console.log(result);
     return res.status(200).json({
       message: "Extraction successful",
       data: result,
