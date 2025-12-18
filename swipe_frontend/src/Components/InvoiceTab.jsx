@@ -8,54 +8,103 @@ const InvoiceTab = () => {
   const invoices = useSelector((state) => state.invoices.invoices || []);
   const [tableData, setTableData] = useState([]);
 
-  // Load invoices locally for editing
   useEffect(() => {
     setTableData(invoices);
   }, [invoices]);
 
-  // Auto-save (debounced)
   useEffect(() => {
     const timeout = setTimeout(() => {
       dispatch(setInvoices(tableData));
     }, 400);
-
     return () => clearTimeout(timeout);
-  }, [tableData]);
+  }, [tableData, dispatch]);
 
-  // Update invoice-level field
+  const inputClass = (val) =>
+    `bg-black border px-2 py-1 rounded ${
+      val == null ? "border-red-500" : "border-green-500"
+    }`;
+
   const updatefield = (serial, field, value) => {
-    const updated = tableData.map((inv) =>
-      inv.serialNumber === serial ? { ...inv, [field]: value } : inv
+    setTableData((prev) =>
+      prev.map((inv) =>
+        inv.serialNumber === serial ? { ...inv, [field]: value } : inv
+      )
     );
-    setTableData(updated);
   };
 
-  // Update product-level field
+  const computeProduct = (p) => {
+    const qty = Number(p.quantity);
+    const unitPrice = Number(p.unitPrice);
+    const taxRate = Number(p.taxRate);
+    const discount = Number(p.discount) || 0;
+
+    if (isNaN(qty) || isNaN(unitPrice) || isNaN(taxRate)) {
+      return p;
+    }
+
+    const amountBeforeTax = qty * unitPrice - discount;
+    const taxAmount = (amountBeforeTax * taxRate) / 100;
+    const priceWithTax = amountBeforeTax + taxAmount;
+
+    return {
+      ...p,
+      taxableValue: amountBeforeTax, 
+      amountBeforeTax, 
+      taxAmount,
+      priceWithTax,
+    };
+  };
+
+  const computeInvoice = (inv) => {
+    const amountBeforeTax = inv.products.reduce(
+      (s, p) => s + (Number(p.amountBeforeTax) || 0),
+      0
+    );
+
+    const taxamount = inv.products.reduce(
+      (s, p) => s + (Number(p.taxAmount) || 0),
+      0
+    );
+
+    return {
+      ...inv,
+      amountBeforeTax,
+      taxamount,
+      totalAmount: amountBeforeTax + taxamount,
+    };
+  };
+
+  const BASE_FIELDS = ["quantity", "unitPrice", "taxRate"];
+
   const updateProduct = (serial, index, field, value) => {
     const updated = tableData.map((inv) => {
       if (inv.serialNumber !== serial) return inv;
 
-      const updatedProducts = inv.products.map((p, i) =>
-        i === index ? { ...p, [field]: value } : p
-      );
+      const updatedProducts = inv.products.map((p, i) => {
+        if (i !== index) return p;
 
-      return { ...inv, products: updatedProducts };
+        const updatedProduct = { ...p, [field]: value };
+
+        if (BASE_FIELDS.includes(field)) {
+          return computeProduct(updatedProduct);
+        }
+        return updatedProduct;
+      });
+
+      const updatedInvoice = { ...inv, products: updatedProducts };
+
+      if (BASE_FIELDS.includes(field)) {
+        return computeInvoice(updatedInvoice);
+      }
+
+      return updatedInvoice;
     });
 
     setTableData(updated);
   };
 
-  // Border color utility
-  const inputClass = (val) =>
-    `bg-black border px-2 py-1 rounded  ${
-      val == null ? "border-red-500" : "border-green-500"
-    }`;
-  if (invoices.length === 0)
-    return (
-      <>
-        <InitialLoader />
-      </>
-    );
+  if (invoices.length === 0) return <InitialLoader />;
+
   return (
     <div className="text-white">
       <h2 className="text-2xl font-semibold mb-6">Invoices</h2>
@@ -64,24 +113,23 @@ const InvoiceTab = () => {
         <table className="min-w-max w-full border-collapse">
           <thead>
             <tr className="border-b border-gray-600 bg-gray-800">
-              <th className="px-2 py-2 text-left">Serial</th>
-              <th className="px-6 py-2 text-left">Customer</th>
-              <th className="px-6 py-2 text-left">GSTIN</th>
-
-              <th className="px-6 py-2 text-left">Product</th>
-              <th className="px-6 py-2 text-left">Qty</th>
-              <th className="px-6 py-2 text-left">Tax %</th>
-              <th className="px-6 py-2 text-left">Tax Amt</th>
-              <th className="px-6 py-2 text-left">Price w/Tax</th>
-
-              <th className="px-6 py-2 text-left">Amt Before Tax</th>
-              <th className="px-6 py-2 text-left">Total Tax</th>
-              <th className="px-6 py-2 text-left">Total</th>
-              <th className="px-6 py-2 text-left">Pending</th>
-              <th className="px-6 py-2 text-left">Pay Mode</th>
-              <th className="px-6 py-2 text-left">Status</th>
-              <th className="px-6 py-2 text-left">Created By</th>
-              <th className="px-6 py-2 text-left">Date</th>
+              <th className="px-6 py-2">Serial</th>
+              <th className="px-6 py-2">Customer</th>
+              <th className="px-6 py-2">GSTIN</th>
+              <th className="px-6 py-2">Product</th>
+              <th className="px-6 py-2">Qty</th>
+              <th className="px-6 py-2">Unit Price</th>
+              <th className="px-6 py-2">Tax %</th>
+              <th className="px-6 py-2">Tax Amt</th>
+              <th className="px-6 py-2">Price w/Tax</th>
+              <th className="px-6 py-2">Amt Before Tax</th>
+              <th className="px-6 py-2">Total Tax</th>
+              <th className="px-6 py-2">Total</th>
+              <th className="px-6 py-2">Pending</th>
+              <th className="px-6 py-2">Pay Mode</th>
+              <th className="px-6 py-2">Status</th>
+              <th className="px-6 py-2">Created By</th>
+              <th className="px-6 py-2">Date</th>
             </tr>
           </thead>
 
@@ -92,20 +140,15 @@ const InvoiceTab = () => {
                   key={`${inv.serialNumber}-${index}`}
                   className="border-b border-gray-700"
                 >
-                  {/* SERIAL NUMBER */}
                   <td className="px-6 py-2">
-                    {index === 0 ? inv.serialNumber : ""}
+                    {index === 0 && inv.serialNumber}
                   </td>
 
-                  {/* CUSTOMER NAME */}
                   <td className="px-6 py-2">
                     {index === 0 && (
                       <input
                         className={inputClass(inv.customerName)}
                         value={inv.customerName ?? ""}
-                        placeholder={
-                          inv.customerName == null ? "❗missing" : ""
-                        }
                         onChange={(e) =>
                           updatefield(
                             inv.serialNumber,
@@ -117,13 +160,11 @@ const InvoiceTab = () => {
                     )}
                   </td>
 
-                  {/* GSTIN */}
                   <td className="px-6 py-2">
                     {index === 0 && (
                       <input
                         className={inputClass(inv.gstin)}
                         value={inv.gstin ?? ""}
-                        placeholder={inv.gstin == null ? "❗missing" : ""}
                         onChange={(e) =>
                           updatefield(inv.serialNumber, "gstin", e.target.value)
                         }
@@ -131,12 +172,10 @@ const InvoiceTab = () => {
                     )}
                   </td>
 
-                  {/* PRODUCT NAME */}
                   <td className="px-6 py-2">
                     <input
                       className={inputClass(p.name)}
                       value={p.name ?? ""}
-                      placeholder={p.name == null ? "❗missing" : ""}
                       onChange={(e) =>
                         updateProduct(
                           inv.serialNumber,
@@ -148,12 +187,10 @@ const InvoiceTab = () => {
                     />
                   </td>
 
-                  {/* QTY */}
                   <td className="px-6 py-2">
                     <input
-                      className={`${inputClass(p.quantity)} w-25`}
+                      className={inputClass(p.quantity)}
                       value={p.quantity ?? ""}
-                      placeholder={p.quantity == null ? "❗missing" : ""}
                       onChange={(e) =>
                         updateProduct(
                           inv.serialNumber,
@@ -165,12 +202,25 @@ const InvoiceTab = () => {
                     />
                   </td>
 
-                  {/* TAX % */}
                   <td className="px-6 py-2">
                     <input
-                      className={`${inputClass(p.taxRate)} w-25`}
+                      className={inputClass(p.unitPrice)}
+                      value={p.unitPrice ?? ""}
+                      onChange={(e) =>
+                        updateProduct(
+                          inv.serialNumber,
+                          index,
+                          "unitPrice",
+                          e.target.value
+                        )
+                      }
+                    />
+                  </td>
+
+                  <td className="px-6 py-2">
+                    <input
+                      className={inputClass(p.taxRate)}
                       value={p.taxRate ?? ""}
-                      placeholder={p.taxRate == null ? "❗missing" : ""}
                       onChange={(e) =>
                         updateProduct(
                           inv.serialNumber,
@@ -182,12 +232,10 @@ const InvoiceTab = () => {
                     />
                   </td>
 
-                  {/* TAX AMOUNT */}
                   <td className="px-6 py-2">
                     <input
-                      className={`${inputClass(p.taxAmount)} w-25`}
+                      className={inputClass(p.taxAmount)}
                       value={p.taxAmount ?? ""}
-                      placeholder={p.taxAmount == null ? "❗missing" : ""}
                       onChange={(e) =>
                         updateProduct(
                           inv.serialNumber,
@@ -199,12 +247,10 @@ const InvoiceTab = () => {
                     />
                   </td>
 
-                  {/* PRICE WITH TAX */}
                   <td className="px-6 py-2">
                     <input
-                      className={`${inputClass(p.priceWithTax)} w-24`}
+                      className={inputClass(p.priceWithTax)}
                       value={p.priceWithTax ?? ""}
-                      placeholder={p.priceWithTax == null ? "❗missing" : ""}
                       onChange={(e) =>
                         updateProduct(
                           inv.serialNumber,
@@ -216,15 +262,11 @@ const InvoiceTab = () => {
                     />
                   </td>
 
-                  {/* AMOUNT BEFORE TAX */}
                   <td className="px-6 py-2">
                     {index === 0 && (
                       <input
-                        className={`${inputClass(inv.amountBeforeTax)} w-25`}
+                        className={inputClass(inv.amountBeforeTax)}
                         value={inv.amountBeforeTax ?? ""}
-                        placeholder={
-                          inv.amountBeforeTax == null ? "❗missing" : ""
-                        }
                         onChange={(e) =>
                           updatefield(
                             inv.serialNumber,
@@ -236,13 +278,11 @@ const InvoiceTab = () => {
                     )}
                   </td>
 
-                  {/* TOTAL TAX */}
                   <td className="px-6 py-2">
                     {index === 0 && (
                       <input
-                        className={`${inputClass(inv.taxamount)} w-25`}
+                        className={inputClass(inv.taxamount)}
                         value={inv.taxamount ?? ""}
-                        placeholder={inv.taxamount == null ? "❗missing" : ""}
                         onChange={(e) =>
                           updatefield(
                             inv.serialNumber,
@@ -254,13 +294,11 @@ const InvoiceTab = () => {
                     )}
                   </td>
 
-                  {/* TOTAL AMOUNT */}
                   <td className="px-6 py-2">
                     {index === 0 && (
                       <input
-                        className={`${inputClass(inv.totalAmount)} w-25`}
+                        className={inputClass(inv.totalAmount)}
                         value={inv.totalAmount ?? ""}
-                        placeholder={inv.totalAmount == null ? "❗missing" : ""}
                         onChange={(e) =>
                           updatefield(
                             inv.serialNumber,
@@ -272,15 +310,11 @@ const InvoiceTab = () => {
                     )}
                   </td>
 
-                  {/* PENDING */}
                   <td className="px-6 py-2">
                     {index === 0 && (
                       <input
-                        className={`${inputClass(inv.amountPending)} w-25`}
+                        className={inputClass(inv.amountPending)}
                         value={inv.amountPending ?? ""}
-                        placeholder={
-                          inv.amountPending == null ? "❗missing" : ""
-                        }
                         onChange={(e) =>
                           updatefield(
                             inv.serialNumber,
@@ -292,15 +326,11 @@ const InvoiceTab = () => {
                     )}
                   </td>
 
-                  {/* PAYMENT METHOD */}
                   <td className="px-6 py-2">
                     {index === 0 && (
                       <input
-                        className={`${inputClass(inv.paymentMethod)} w-24`}
+                        className={inputClass(inv.paymentMethod)}
                         value={inv.paymentMethod ?? ""}
-                        placeholder={
-                          inv.paymentMethod == null ? "❗missing" : ""
-                        }
                         onChange={(e) =>
                           updatefield(
                             inv.serialNumber,
@@ -312,13 +342,11 @@ const InvoiceTab = () => {
                     )}
                   </td>
 
-                  {/* STATUS */}
                   <td className="px-6 py-2">
                     {index === 0 && (
                       <input
-                        className={`${inputClass(inv.status)} w-25`}
+                        className={inputClass(inv.status)}
                         value={inv.status ?? ""}
-                        placeholder={inv.status == null ? "❗missing" : ""}
                         onChange={(e) =>
                           updatefield(
                             inv.serialNumber,
@@ -330,13 +358,11 @@ const InvoiceTab = () => {
                     )}
                   </td>
 
-                  {/* CREATED BY */}
                   <td className="px-6 py-2">
                     {index === 0 && (
                       <input
-                        className={`${inputClass(inv.createdBy)} w-25`}
+                        className={inputClass(inv.createdBy)}
                         value={inv.createdBy ?? ""}
-                        placeholder={inv.createdBy == null ? "❗missing" : ""}
                         onChange={(e) =>
                           updatefield(
                             inv.serialNumber,
@@ -348,14 +374,11 @@ const InvoiceTab = () => {
                     )}
                   </td>
 
-                  {/* DATE */}
-                  <td className="px-2 py-2">
+                  <td className="px-6 py-2">
                     {index === 0 && (
-                      <>
-                        <div className="bg-black px-2 py-1 rounded">
-                          {inv.invoiceDate}
-                        </div>
-                      </>
+                      <div className="bg-black px-2 py-1 rounded">
+                        {inv.invoiceDate}
+                      </div>
                     )}
                   </td>
                 </tr>
