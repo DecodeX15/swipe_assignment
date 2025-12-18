@@ -231,6 +231,7 @@ Now extract the data.
     });
   } catch (error) {
     console.error("Gemini error:", error);
-    return res.status(500).json({ error: error.message });
+    console.log(error);
+    return res.status(500).json({ error: error.message || "Server Error" });
   }
 };
