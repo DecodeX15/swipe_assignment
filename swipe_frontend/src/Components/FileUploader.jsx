@@ -34,7 +34,7 @@ const UploadBox = () => {
     if (invalidFiles.length > 0) {
       setLoading(false);
       toast.error("Invalid file selected!");
-      e.target.value = null; 
+      e.target.value = null;
       return;
     }
 
@@ -54,11 +54,13 @@ const UploadBox = () => {
       setSelectedFiles(files);
       toast.success("Files uploaded and analyzed successfully!");
     } catch (error) {
-      toast.error("Upload failed");
+      toast.error(
+        "You exceeded your current quota, please check your plan and billing details."
+      );
       setSelectedFiles([]);
     } finally {
       setLoading(false);
-      e.target.value = null; 
+      e.target.value = null;
     }
   };
 
