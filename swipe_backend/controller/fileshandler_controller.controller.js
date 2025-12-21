@@ -224,13 +224,13 @@ Now extract the data.
     // }
     // await sleep(5000);
     const result = check_products(extracted);
-    console.log(result);
     return res.status(200).json({
       message: "Extraction successful",
       data: result,
     });
   } catch (error) {
     console.error("Gemini error:", error);
-    return res.status(500).json({ error: error.message });
+    console.log(error);
+    return res.status(500).json({ error: error.message || "Server Error" });
   }
 };
